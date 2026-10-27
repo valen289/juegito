@@ -1,0 +1,235 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>¿Real o Estafa?</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: una sola pantalla por paso (inicio → mensaje → veredicto → resultado), pensada para tablet o notebook en un stand */
+:root{
+  --bg:#eef1f6; --surface:#ffffff; --ink:#141a2b; --muted:#5b6478;
+  --line:#d5dbe6; --tape:#f5c518; --tape-ink:#1b1606;
+  --scam:#d63a2f; --scam-soft:#fde5e2; --ok:#1f8a4c; --ok-soft:#dcf3e5;
+  --bubble:#e4e8f0; --hl:#ffe27a;
+  --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0f1422; --surface:#182033; --ink:#eef1f7; --muted:#9aa4ba;
+  --line:#2b3550; --tape:#f5c518; --tape-ink:#1b1606;
+  --scam:#ff6b5e; --scam-soft:#3a1d1e; --ok:#4fd08a; --ok-soft:#163327;
+  --bubble:#232d45; --hl:#6b5512; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0f1422; --surface:#182033; --ink:#eef1f7; --muted:#9aa4ba;
+  --line:#2b3550; --tape:#f5c518; --tape-ink:#1b1606;
+  --scam:#ff6b5e; --scam-soft:#3a1d1e; --ok:#4fd08a; --ok-soft:#163327;
+  --bubble:#232d45; --hl:#6b5512; color-scheme:dark }
+
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.45;
+  display:flex;flex-direction:column;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.tape{height:14px;margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px)));
+  background:repeating-linear-gradient(-45deg,var(--tape) 0 18px,var(--tape-ink) 18px 36px);flex:none}
+main{flex:1;width:100%;max-width:760px;margin-inline:auto;padding-block:28px 20px;display:flex;flex-direction:column;gap:22px}
+h1,h2{font-family:var(--display);font-weight:800;line-height:1.02;text-wrap:balance;margin:0;letter-spacing:-.01em}
+h1{font-size:clamp(44px,9vw,84px)}
+h2{font-size:clamp(28px,5vw,40px)}
+.eyebrow{font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+p{margin:0;max-width:62ch}
+.lead{font-size:clamp(19px,2.6vw,23px);color:var(--muted)}
+.stamp{display:inline-block;border:4px solid currentColor;padding:2px 12px;transform:rotate(-4deg);border-radius:6px}
+.stamp.scam{color:var(--scam)} .stamp.ok{color:var(--ok)}
+
+button{font:inherit;cursor:pointer;border:0;border-radius:14px}
+button:focus-visible{outline:3px solid var(--tape);outline-offset:3px}
+.primary{background:var(--ink);color:var(--bg);font-family:var(--display);font-weight:800;font-size:24px;padding:18px 30px;align-self:flex-start}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.choice{font-family:var(--display);font-weight:800;font-size:clamp(24px,4.5vw,34px);padding:22px 12px;border:3px solid currentColor;background:var(--surface)}
+.choice.scam{color:var(--scam)} .choice.ok{color:var(--ok)}
+.choice:hover{filter:brightness(.97)}
+.choice small{display:block;font-family:var(--body);font-weight:400;font-size:14px;color:var(--muted);margin-top:4px}
+
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.lvl{padding:2px 8px;border-radius:999px;background:var(--bubble);color:var(--ink)}
+.lvl.l3{background:var(--tape);color:var(--tape-ink)}
+.dots{display:flex;gap:6px}
+.dots i{width:14px;height:14px;border-radius:50%;background:var(--line)}
+.dots i.hit{background:var(--ok)} .dots i.miss{background:var(--scam)} .dots i.now{background:var(--tape)}
+
+.phone{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.from{display:flex;align-items:center;gap:12px}
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--bubble);display:grid;place-items:center;font-weight:700;color:var(--muted);flex:none}
+.from b{display:block}
+.from span{font-size:14px;color:var(--muted)}
+.bubble{background:var(--bubble);border-radius:6px 20px 20px 20px;padding:16px 18px;font-size:clamp(19px,2.8vw,23px);min-width:0;overflow-wrap:anywhere}
+.bubble .url{font-family:var(--mono);font-size:.85em;text-decoration:underline;color:var(--muted)}
+.bubble mark{background:transparent;color:inherit;border-radius:4px;transition:background .3s}
+.revealed .bubble mark{background:var(--hl);box-shadow:0 0 0 2px var(--hl)}
+
+.verdict{border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.verdict.right{background:var(--ok-soft)} .verdict.wrong{background:var(--scam-soft)}
+.verdict ul{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px}
+
+.score{font-family:var(--display);font-weight:800;font-size:clamp(80px,18vw,150px);line-height:.9;font-variant-numeric:tabular-nums}
+.score span{font-size:.4em;color:var(--muted)}
+.prize{background:var(--tape);color:var(--tape-ink);border-radius:14px;padding:14px 18px;font-weight:700;font-size:20px}
+.rule{border-left:6px solid var(--tape);padding:6px 0 6px 16px;font-size:21px}
+.itsp{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:8px}
+.foot{font-size:13px;color:var(--muted);text-align:center;padding-bottom:10px}
+@media (max-width:420px){ .choices{grid-template-columns:1fr} }
+@media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
+@keyframes pop{from{transform:scale(.96);opacity:.4}to{transform:none;opacity:1}}
+.pop{animation:pop .25s ease-out}
+</style>
+
+<div class="tape" aria-hidden="true"></div>
+<main id="app"></main>
+<div class="foot" id="foot"></div>
+
+<script>
+// Mensajes inventados para el juego. Ningún remitente ni link es real.
+// En "parts": texto normal como string, pistas como {t:"...", m:1}, links como {t:"...", url:1}
+const MSGS = [
+  {scam:true, app:"SMS", from:"INFO-BANCO", sub:"Número desconocido", av:"$",
+   parts:["Su cuenta fue ",{t:"BLOQUEADA",m:1},". ",{t:"Ingrese en las próximas 24 hs",m:1}," para evitar la baja definitiva: ",{t:"banco-uy-verificar.top/login",url:1,m:1}],
+   tips:["Te apura con un plazo para que no pienses.","El link no es la página de ningún banco: termina en .top y tiene palabras sueltas.","Los bancos no te piden entrar por un link en un SMS. Si dudás, entrá desde la app oficial."]},
+  {scam:true, app:"WhatsApp", from:"+598 99 ••• 412", sub:"No está en tus contactos", av:"?",
+   parts:["Hola ma, ",{t:"se me rompió el celu, este es mi número nuevo",m:1},". ",{t:"¿Me pasás $4.500?",m:1}," Tengo que pagar algo ",{t:"urgente",m:1},", después te explico 🙏"],
+   tips:["\"Número nuevo\" + pedido de plata es la estafa más común por WhatsApp.","Pide dinero con urgencia y evita dar explicaciones.","Qué hacer: llamar al número viejo o hacer una pregunta que solo esa persona sabría."]},
+  {scam:false, app:"SMS", from:"Verificación", sub:"Mensaje automático", av:"✓",
+   parts:["Tu código de verificación es 482 913. ",{t:"No lo compartas con nadie.",m:1}," Si no lo pediste, ignorá este mensaje."],
+   tips:["Es el código que llega cuando vos mismo pedís entrar a una cuenta.","No pide nada y no trae links. Te avisa que no lo compartas.","Ojo: si después alguien te escribe pidiéndote ese código, ESO sí es una estafa."]},
+  {scam:true, app:"Mensaje directo", from:"sorteos.oficial.2026", sub:"Cuenta creada hace 3 días", av:"🎁",
+   parts:[{t:"¡GANASTE un celular nuevo!",m:1}," Fuiste elegido en nuestro sorteo. Para recibirlo ",{t:"pagá $390 de envío",m:1}," acá 👉 ",{t:"bit.ly/premio-ya-2026",url:1,m:1}],
+   tips:["No te anotaste en ningún sorteo. Nadie te regala un celular de la nada.","Si tenés que pagar para cobrar un premio, no hay premio.","El link acortado esconde a dónde te lleva realmente."]},
+  {scam:false, app:"Correo", from:"Dirección del liceo", sub:"direccion@liceo.edu.uy", av:"L",
+   parts:["Recordatorio: mañana no hay clases por jornada docente. Las actividades siguen el jueves en el horario habitual. Saludos, Dirección."],
+   tips:["Da información, no te pide datos, plata ni que toques un link.","Lo podés confirmar preguntándole a un profe o a un compañero.","No toda notificación es peligrosa. La clave es fijarse qué te piden."]},
+  {scam:true, app:"Mensaje en el juego", from:"Admin_Rewards", sub:"Jugador nivel 1", av:"★",
+   parts:[{t:"Robux gratis",m:1}," para los primeros 100. Entrá a ",{t:"robux-free-gen.net",url:1,m:1}," e ",{t:"iniciá sesión con tu usuario y contraseña",m:1}," para recibirlos."],
+   tips:["Las monedas gratis son el gancho clásico para robar cuentas de juegos.","Te pide tu contraseña en una página que no es la del juego.","Un admin de verdad nunca te pide tu contraseña."]},
+  {scam:true, app:"SMS", from:"ENVIOS", sub:"Número desconocido", av:"📦",
+   parts:["Tu paquete está ",{t:"retenido en aduana",m:1},". ",{t:"Pagá $120 de tasa",m:1}," para liberarlo: ",{t:"correo-envios-uy.info/pago",url:1,m:1}],
+   tips:["Llega aunque no hayas comprado nada. Juegan con que alguien siempre está esperando algo.","Te pide pagar con tarjeta en una página desconocida.","Si esperás un envío, consultá en la página oficial escribiendo vos la dirección."]},
+  {scam:false, app:"Notificación", from:"Tu red social", sub:"Alerta de seguridad", av:"!",
+   parts:["Iniciaste sesión desde un dispositivo nuevo (Windows · Paysandú). Si no fuiste vos, ",{t:"cambiá tu contraseña desde la app",m:1},"."],
+   tips:["Te manda a la app que ya tenés, no a un link.","No pide datos: solo te informa.","Si no fuiste vos, actuá rápido: cambiá la contraseña y activá la verificación en dos pasos."]},
+  {scam:true, lvl:2, app:"Llamada", from:"Soporte técnico", sub:"Llamada entrante · 099 •••", av:"☎",
+   parts:["Hola, te hablo del soporte de tu compañía de celular. Estamos actualizando tu línea. ",{t:"Te va a llegar un código por SMS, ¿me lo leés",m:1}," así termino la verificación?"],
+   tips:["Con ese código te roban la cuenta de WhatsApp o de la red social. Es la estafa más común con chicos de tu edad.","Ninguna empresa de verdad te pide que le leas un código.","Si te llaman así, cortá. Vos llamás después al número oficial si querés confirmar."]},
+  {scam:true, lvl:3, app:"Correo", from:"TiendaYa", sub:"avisos@tiendaya-compras.com", av:"T",
+   parts:["Tu compra de una notebook por $28.900 fue aprobada. Llega el jueves. ",{t:"Si no reconocés esta compra",m:1},", cancelala desde ",{t:"tiendaya-ayuda.com/cancelar",url:1,m:1},"."],
+   tips:["Está bien escrito y no grita. Las estafas buenas se ven así.","El truco es asustarte con una compra que no hiciste, para que toques el link sin pensar.","La tienda es tiendaya.com.uy, pero el link y el remitente usan otras direcciones parecidas."]},
+  {scam:true, lvl:3, app:"Correo", from:"Instagram", sub:"seguridad@instagrarn.com", av:"I",
+   parts:["Detectamos un intento de inicio de sesión en tu cuenta. Si no fuiste vos, revisá tu actividad en ",{t:"instagrarn.com/security",url:1,m:1},"."],
+   tips:["Mirá bien: dice \"instagrarn\". Usa \"rn\" en lugar de \"m\", y de un vistazo parecen iguales.","El remitente usa la misma dirección trucha.","Un mensaje de seguridad real te manda a revisar desde la app, no a una página."]},
+  {scam:false, lvl:3, app:"SMS", from:"TiendaYa", sub:"Remitente verificado", av:"T",
+   parts:["Tu pedido #48213 ya salió. Podés seguir el envío en ",{t:"tiendaya.com.uy/pedidos",url:1,m:1},"."],
+   tips:["Este sí es real: el link es la página oficial de la tienda donde compraste.","Tener un link no hace que un mensaje sea estafa. Lo importante es a dónde lleva.","Igual, lo más seguro es entrar desde la app o escribiendo vos la dirección."]}
+];
+// Dificultad: 1 fácil, 2 media, 3 difícil
+const BASE_LVL=[1,1,2,1,1,1,2,2];
+MSGS.forEach((m,k)=>{ if(!m.lvl) m.lvl=BASE_LVL[k]; });
+const LVL_NAME={1:"Fácil",2:"Media",3:"Difícil"};
+const ROUND = 6, PRIZE_AT = 5;
+const app = document.getElementById('app');
+let deck=[], i=0, results=[];
+
+function count(add){
+  let n=0;
+  try{ n=parseInt(localStorage.getItem('roe-visitas')||'0',10)||0; if(add){n++;localStorage.setItem('roe-visitas',String(n));} }catch(e){}
+  document.getElementById('foot').textContent = n ? `Visitantes que jugaron en esta compu: ${n}` : '';
+}
+function shuffle(a){for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a}
+function buildDeck(){
+  // 2 difíciles + 4 del resto, con 2 o 3 mensajes reales, ordenados de fácil a difícil
+  for(;;){
+    const hard=shuffle(MSGS.filter(m=>m.lvl===3)).slice(0,2);
+    const rest=shuffle(MSGS.filter(m=>m.lvl<3)).slice(0,4);
+    const d=[...hard,...rest], reals=d.filter(m=>!m.scam).length;
+    if(reals>=2 && reals<=3) return d.sort((a,b)=>a.lvl-b.lvl);
+  }
+}
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function msgHTML(m){
+  return m.parts.map(p=>{
+    if(typeof p==='string') return esc(p);
+    let h=esc(p.t); if(p.url) h=`<span class="url">${h}</span>`;
+    return p.m?`<mark>${h}</mark>`:h;
+  }).join('');
+}
+function dots(){
+  return `<div class="dots" aria-label="Progreso">${deck.map((_,k)=>{
+    const c = k<results.length?(results[k]?'hit':'miss'):(k===i?'now':'');
+    return `<i class="${c}"></i>`}).join('')}</div>`;
+}
+
+function start(){
+  app.innerHTML=`
+    <div class="eyebrow">Stand de ciberseguridad · ITSP</div>
+    <h1>¿Real o <span class="stamp scam">Estafa</span>?</h1>
+    <p class="lead">Te vamos a mostrar ${ROUND} mensajes como los que llegan al celular. Algunos son normales y otros son trampas. Empiezan fáciles y terminan difíciles. Si acertás ${PRIZE_AT} o más, ganás un premio.</p>
+    <button class="primary" id="go">Empezar</button>`;
+  document.getElementById('go').onclick=()=>{deck=buildDeck();i=0;results=[];question();};
+}
+
+function question(){
+  const m=deck[i];
+  app.innerHTML=`
+    <div class="top"><div class="eyebrow">Mensaje ${i+1} de ${deck.length} · <span class="lvl l${m.lvl}">${LVL_NAME[m.lvl]}</span></div>${dots()}</div>
+    <div class="phone pop" id="phone">
+      <div class="from"><div class="avatar">${m.av}</div><div><b>${esc(m.from)}</b><span>${esc(m.app)} · ${esc(m.sub)}</span></div></div>
+      <div class="bubble">${msgHTML(m)}</div>
+    </div>
+    <div class="choices" id="choices">
+      <button class="choice ok" data-a="0">Real<small>tecla R</small></button>
+      <button class="choice scam" data-a="1">Estafa<small>tecla E</small></button>
+    </div>`;
+  document.querySelectorAll('.choice').forEach(b=>b.onclick=()=>answer(b.dataset.a==='1'));
+}
+
+function answer(saidScam){
+  const m=deck[i], right = saidScam===m.scam;
+  results.push(right);
+  document.getElementById('phone').classList.add('revealed');
+  const last = i===deck.length-1;
+  document.getElementById('choices').outerHTML=`
+    <div class="verdict ${right?'right':'wrong'} pop">
+      <h2>${right?'¡Bien!':'Esta vez no.'} Era <span class="stamp ${m.scam?'scam':'ok'}">${m.scam?'Estafa':'Real'}</span></h2>
+      <ul>${m.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>
+    </div>
+    <button class="primary" id="next">${last?'Ver mi resultado':'Siguiente mensaje'}</button>`;
+  document.querySelector('.top').innerHTML=`<div class="eyebrow">Mensaje ${i+1} de ${deck.length} · <span class="lvl l${m.lvl}">${LVL_NAME[m.lvl]}</span></div>${dots()}`;
+  const nx=document.getElementById('next'); nx.focus();
+  nx.onclick=()=>{ if(last) end(); else {i++;question();} };
+}
+
+function end(){
+  const ok=results.filter(Boolean).length; count(true);
+  const msg = ok===ROUND?'Detector perfecto. Pensás como alguien de seguridad informática.'
+            : ok>=PRIZE_AT?'Muy bien. Es difícil engañarte.'
+            : ok>=3?'Nada mal. Ahora ya sabés qué pistas mirar.'
+            :'Tranqui: a mucha gente la engañan. Lo importante es que ahora sabés qué mirar.';
+  app.innerHTML=`
+    <div class="eyebrow">Tu resultado</div>
+    <div class="score pop">${ok}<span> / ${ROUND}</span></div>
+    <h2>${msg}</h2>
+    ${ok>=PRIZE_AT?'<div class="prize">¡Ganaste! Pedile tu premio a alguien del stand.</div>':''}
+    <p class="rule"><b>La regla de oro:</b> si un mensaje te apura, te pide plata o te pide datos, frená y preguntale a alguien antes de hacer nada.</p>
+    <div class="itsp">
+      <div class="eyebrow">¿Te gustó descubrir las trampas?</div>
+      <p>Entender cómo funcionan los ataques para poder frenarlos es parte de lo que se aprende en informática acá en el ITSP. Preguntanos cómo es.</p>
+    </div>
+    <button class="primary" id="again">Siguiente visitante</button>`;
+  const a=document.getElementById('again'); a.focus(); a.onclick=start;
+}
+
+document.addEventListener('keydown',e=>{
+  const k=e.key.toLowerCase();
+  if(document.getElementById('choices')){ if(k==='r') answer(false); if(k==='e') answer(true); }
+});
+count(false); start();
+</script>
+
+</body></html>
